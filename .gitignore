@@ -1,0 +1,8 @@
+# Python general
+.venv/
+env/
+__pycache__/
+
+# PySide
+ui_*.py
+rc_*.py
