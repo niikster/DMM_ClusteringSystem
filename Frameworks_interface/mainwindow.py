@@ -1,5 +1,4 @@
 # This Python file uses the following encoding: utf-8
-import sys
 import time
 
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
@@ -32,7 +31,6 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QWidget,
     QPushButton,
-    QStyleFactory,
     QMenuBar,
     QSpacerItem,
     QSizePolicy,
@@ -53,10 +51,13 @@ from PySide6.QtWidgets import (
 )
 
 from Frameworks_ccore.SettingsApp import SettingsApp
-from ui_form import Ui_MainWindow
+from .ui_form import Ui_MainWindow
 from Frameworks_ccore.Loader import Loader
-from widgets.sliderButton.QSliderButton import QSliderButton
+from .widgets.sliderButton.QSliderButton import QSliderButton
+from .widgets.QSpliter.qspliter import QSpliter
+
 from sklearn.datasets import make_moons, make_blobs, make_circles  # pip install scikit-learn
+
 from DatasetsGenerators.make_dna import make_dna
 from DatasetsGenerators.make_spheres import make_spheres
 from ClusteringMethods.ClasteringAlgorithms import (
@@ -66,7 +67,6 @@ from ClusteringMethods.ClasteringAlgorithms import (
     ConcreteStrategyCURE,
     ConcreteStrategyROCK,
 )
-from widgets.QSpliter.qspliter import QSpliter
 from AnalysisMethods.AnalysisAlgorithms import DunnIndex, DunnIndexMean, DBi, converter_to_c
 
 import qstylizer.parser     # pip install qstylizer
@@ -82,7 +82,7 @@ ORGANIZATION_NAME = 'RTU MIREA'
 ORGANIZATION_DOMAIN = 'mirea.ru'
 APPLICATION_NAME = 'ClustSystem'
 APPLICATION_VERSION = '0.1.2'
-app = None
+
 LIST_TYPE_DISTRIBUTION = ['Нормальное', 'Показательное', 'Биноминальное']
 CASE_TYPES = {'lb': QLabel, 'le': QLineEdit, 'chb': QCheckBox, 'pb': QPushButton}
 DEFAULT_VALUE = [100,  # n_sample
@@ -199,7 +199,7 @@ def loader_settings():
     if load_settings_app():
         current_theme = load_theme_current_app()
         qAppStyle = Loader.load_style_app(current_theme)
-        app.setStyleSheet(qAppStyle)
+        qApp.setStyleSheet(qAppStyle)
     return qAppStyle, current_theme
 
 
@@ -1345,17 +1345,3 @@ class MainWindow(QMainWindow):
             self.dialog.setStyleSheet(self.styleSheet())
         self.sliderButton_install_style()
 
-
-# [1.5]
-'''
-    @brief  Точка входа в приложение.
-'''
-if __name__ == "__main__":
-    init_config_app()  # Инициализация метаданных приложения для возможности обращения по ним к реестру ОС
-    # и получение информации о текущей теме
-    app = QApplication(sys.argv)
-    app.setStyle(QStyleFactory.create("Fusion"))
-    [qAppStyle, current_theme] = loader_settings()
-    mw = MainWindow(qAppStyle, current_theme)
-    mw.show()
-    sys.exit(app.exec())

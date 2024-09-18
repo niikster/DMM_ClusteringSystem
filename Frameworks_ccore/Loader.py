@@ -7,7 +7,7 @@ from PySide6.QtCore import (
 import qstylizer.parser # pip install qstylizer
 import qstylizer.parser
 
-import Frameworks_interface.rc_resource
+from Frameworks_interface import rc_resource
 
 THEME_FIRST_PATH = ':/qss/ThemeFirst.css'
 THEME_SECOND_PATH = ':/qss/ThemeSecond.css'

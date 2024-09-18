@@ -6,6 +6,7 @@
         "Frameworks_interface/icon"
     ],
     "files": [
+        "main.py",
         "Frameworks_interface/mainwindow.py",
         "Frameworks_interface/form.ui",
         "Frameworks_interface/resource.qrc",
