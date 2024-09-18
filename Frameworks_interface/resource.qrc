@@ -1,9 +1,7 @@
 <RCC>
     <qresource prefix="/">
-        <file>qss/style.css</file>
         <file>icon/icon.ico</file>
-        <file>qss/ThemeDark.css</file>
-        <file>qss/ThemeLight.css</file>
-        <file>qss/ThemeDarkBlue.css</file>
+        <file>qss/ThemeFirst.css</file>
+        <file>qss/ThemeSecond.css</file>
     </qresource>
 </RCC>

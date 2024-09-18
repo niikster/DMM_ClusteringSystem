@@ -7,8 +7,10 @@ from PySide6.QtCore import (
 import qstylizer.parser # pip install qstylizer
 import qstylizer.parser
 
-THEME_FIRST_PATH = 'qss\\ThemeFirst.css'
-THEME_SECOND_PATH = 'qss\\ThemeSecond.css'
+import Frameworks_interface.rc_resource
+
+THEME_FIRST_PATH = ':/qss/ThemeFirst.css'
+THEME_SECOND_PATH = ':/qss/ThemeSecond.css'
 
 class Loader:
     def __init__(self):
@@ -25,8 +27,9 @@ class Loader:
         # Реализовать проверку наличия/отсутствия тем в путях.
 
 
-        if styleF.exists():
-            print("Ok")
+        if not styleF.exists():
+            print("ERR: Styles not loaded")
+            exit(1)
 
         if styleF.open(
                 QFile.OpenModeFlag.ReadOnly | QFile.OpenModeFlag.Text):
