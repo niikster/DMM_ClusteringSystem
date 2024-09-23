@@ -3,10 +3,12 @@
 #       Fedorov A. V. [alexis.sasis7@gmail.com]
 #       Griban M. S. [gribanms007@gmail.com]
 
+from typing import List
+
 import numpy as np
 from scipy.spatial import distance
 
-def converter_to_c(points, labels) -> []:
+def converter_to_c(points, labels) -> List:
     C = []  # count=len(set(labels)) np.float # При создании С=[[]]*len(set(labels))
             # мы фактически получаем ссылки на некий объект [] len(set(labels)) раз
             # и при добавлении нового элемента в массив С, он будет во всех подмассивах.

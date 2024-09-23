@@ -24,6 +24,7 @@ from PySide6.QtGui import (
 from PySide6.QtWidgets import (
     QApplication,
     QCheckBox,
+    QErrorMessage,
     QLabel,
     QMainWindow,
     QStatusBar,
@@ -219,7 +220,7 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         self.setProperty('theme_current', theme_current)    # Задание значения текущей темы.
         self.setStyleSheet(styleApp)                        # Установка стилей программы
-        self.dialog: SettingsApp = None                     # Диалоговое окно настроек программы.
+        self.dialog: SettingsApp|None = None                     # Диалоговое окно настроек программы.
         self.setProperty('dragPos', None)                   # Позиция перемещения курсора мышки при изменении размеров окна.
         self.setProperty('fl', True)                        # Флаг переключения подокон в левом окне.
         # Границы отключены
@@ -241,7 +242,7 @@ class MainWindow(QMainWindow):
 
     def init_gridBase(self) -> None:  # QGridLayout()
         grid = QGridLayout(objectName='gridBasis')
-        grid.addWidget(QPushButton(icon=QIcon('./icon/icon.ico')), 0, 0, 1, 1,
+        grid.addWidget(QPushButton(icon=QIcon(':/icon/icon.ico')), 0, 0, 1, 1,
                        Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
         self.label = QLabel(APPLICATION_NAME, self, objectName='labelClassA')
         grid.addWidget(self.label, 0, 1, 1, 1, Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
@@ -405,7 +406,7 @@ class MainWindow(QMainWindow):
     '''
 
     def handler_fr3(self):
-        frame3 = self.widget1.findChild(QFrame, 'frame3')
+        frame3: QFrame = self.widget1.findChild(QFrame, 'frame3')
         frame3.setEnabled(True)
         match self.property('format_file'):
             case 'jpg' | 'png' | 'bmp':
@@ -820,6 +821,10 @@ class MainWindow(QMainWindow):
                     Data, labels = make_spheres(n_samples=n_samples, factor=factor, noise=noise,
                                                 shuffle=shuffle, random_state=random_state)
                     data = np.array(Data).transpose()
+                case _:
+                    msg = QErrorMessage
+                    msg.showMessage(message="Unknown param requested")
+                    return
 
             data /= norm
             match data.shape[1]:
