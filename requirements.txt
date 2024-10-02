@@ -1,7 +1,7 @@
 numpy
 scipy
 matplotlib
-scikit-learn
+scikit-learn==1.3.2
 pandas
 Pillow
 pyclustering
