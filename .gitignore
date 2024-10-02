@@ -6,3 +6,6 @@ __pycache__/
 # PySide
 ui_*.py
 rc_*.py
+
+# JB tools
+.idea
