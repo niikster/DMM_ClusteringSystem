@@ -8,7 +8,16 @@ from matplotlib import pyplot as plt
 from numpy import linspace, cos, sin, pi
 
 from numpy.random import default_rng
+"""
+    Функция для генерации данных, имитирующих структуру ДНК.
 
+    Параметры:
+        n_samples (int): Количество генерируемых образцов.
+        center_box (tuple): Диапазон значений для сдвига каждого узла по оси (default = (-1.0, 1.0)).
+        width (float): Ширина структуры (default = 0.5).
+        min_u (float): Минимальное значение параметра для формирования витков (default = 0.0).
+        max_u (float): Максимальное значение параметра для формирования витков (default = 3 * pi).
+"""
 def make_dna(n_samples: int = 300, center_box = (-1.0, 1.0),
              width: float  = 0.5, min_u: float = 0.0, max_u: float = 3 * pi):
     # ВЫЧИСЛЕНИЯ

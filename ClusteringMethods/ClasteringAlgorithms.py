@@ -46,6 +46,14 @@ class Context:
             Вместо того, чтобы самостоятельно реализовывать множественные версии
             алгоритма, Контекст делегирует некоторую работу объекту Стратегии.
             """
+            """
+            Выполняет кластеризацию изображения.
+
+            pixels: Массив пикселей изображения.
+            params: Параметры для алгоритма кластеризации.
+            i: Флаг, определяющий метод обработки.
+            return: Метки кластеров для каждого пикселя.
+            """            
             if i > 0:
                 # Извлечение координат и цветов всех пикселей в формате HSV
                 coords_and_colors = [
@@ -77,6 +85,13 @@ class Context:
             return labels
 
     def do_some_clustering_points(self, data, params) -> []:
+        """
+        Выполняет кластеризацию точек.
+
+        data: Входные данные в виде списка точек.
+        params: Параметры для алгоритма кластеризации.
+        return: Метки кластеров для каждой точки.
+        """        
         fitchs = np.array(data, dtype=float)
         points = fitchs.transpose()
         if isinstance(self._strategy, ConcreteStrategyBIRCH_from_SKLEARN_LEARN):
@@ -96,6 +111,7 @@ class Strategy(ABC):
     """
     @abstractmethod
     def clastering_image(self, image_path: str, num_clasters: int):
+        
         pass
 
     @abstractmethod
@@ -103,9 +119,13 @@ class Strategy(ABC):
         pass
 
     """
-    @brief Метод преобразование cluster_index in labels для birch из sklearn-learn.
+    Метод преобразование cluster_index in labels для BIRCH из sklearn-learn.
     """
     def clusters_to_labels(self, clusters) -> []:
+        """
+        clusters (list): Список кластеров, где каждый кластер содержит индексы точек.
+        return (list): Список меток для каждой точки.
+        """        
         size = sum(map(lambda x: len(x), clusters))
         labels = [0] * size
         for cluster_index in range(len(clusters)):
@@ -122,14 +142,13 @@ class Strategy(ABC):
 class ConcreteStrategyBIRCH_from_SKLEARN_LEARN(Strategy):
 
     '''
-        @brief метод кластеризации изображений с использованием birch из sklearn-learn.
+        Метод кластеризации изображений с использованием BIRCH из sklearn-learn.
 
-        @param[in] self (obj): The current object.
-        @param[in] pixels (list): the image represented by pixels.
-        @param[in] params (list): the parameters for clustering.
-
-        @return (list) The label for everyone pixel.
-    '''
+        self (obj): Текущий объект.
+        pixels (list): Список пикселей.
+        params (list): Параметры алгоритма.
+        return (list): Метки кластеров.
+    ''' 
     def clastering_image(self, pixels: str, params: []) -> list:
         # Создание и обучение объекта BIRCH
         birch1 = Birch(n_clusters=int(params[0]), branching_factor=int(params[1]), threshold=params[2],
@@ -143,12 +162,14 @@ class ConcreteStrategyBIRCH_from_SKLEARN_LEARN(Strategy):
 
 
     '''
-        @brief метод кластеризации точек с использованием birch из sklearn-learn.
+    Метод кластеризации точек с использованием BIRCH из sklearn-learn.
 
-        @param[in] self (obj): The current object.
-    	@param[in] points (list): the image represented by points.
+    Параметры:
+        points (list): Данные, представленные списком точек.
+        params (list): Параметры для алгоритма кластеризации.
 
-    	@return (list) The label for everyone point.
+    Возвращает:
+        list: Метки кластеров для каждой точки.
     '''
     def clastering_points(self, points, params) -> []:
         # Создание и обучение объекта BIRCH
@@ -165,12 +186,14 @@ class ConcreteStrategyBIRCH_from_SKLEARN_LEARN(Strategy):
 
 class ConcreteStrategyBIRCH_from_PYCLUSTERING(Strategy):
     '''
-        @brief метод кластеризации пикселей с использованием birch из pyclustering.
+    Метод кластеризации пикселей с использованием BIRCH из pyclustering.
 
-        @param[in] self (obj): The current object.
-    	@param[in] points (list): the image represented by pixels.
+    Параметры:
+        pixels (list): Изображение, представленное списком пикселей.
+        params (list): Параметры для алгоритма кластеризации.
 
-    	@return (list) The label for everyone point.
+    Возвращает:
+        list: Метки кластеров для каждого пикселя.
     '''
     def clastering_image(self, pixels, params: []) -> []:
         type = self.TYPE(params[9])
@@ -181,13 +204,14 @@ class ConcreteStrategyBIRCH_from_PYCLUSTERING(Strategy):
         return np.array(self.clusters_to_labels(instance.get_clusters()))
 
     '''
-        @brief метод кластеризации точек с использованием birch из pyclustering.
+    Метод кластеризации точек с использованием BIRCH из pyclustering.
 
-        @param[in] self (obj): The current object.
-    	@param[in] points (list): the image represented by points.
-    	@param[in] params (list): the parameters for clustering.
+    Параметры:
+        points (list): Данные, представленные списком точек.
+        params (list): Параметры для алгоритма кластеризации.
 
-    	@return (list) The label for everyone point.
+    Возвращает:
+        list: Метки кластеров для каждой точки.
     '''
     def clastering_points(self, points, params):
         type = self.TYPE(params[9])
@@ -198,12 +222,13 @@ class ConcreteStrategyBIRCH_from_PYCLUSTERING(Strategy):
         return np.array(self.clusters_to_labels(instance.get_clusters()))
 
     '''
-        @brief метод, определяющий тип метрики для birch из pyclustering.
+    Метод, определяющий тип метрики для BIRCH из pyclustering.
 
-        @param[in] self (obj): The current object.
-    	@param[in] param (list): the index metric from mainwindow.py.
+    Параметры:
+        param (lsit): Название метрики, выбранное пользователем.
 
-    	@return (measurement_type: int) The type metric.
+    Возвращает:
+        measurement_type(int): Тип метрики для алгоритма кластеризации.
     '''
     def TYPE(self, param):
         match param:
@@ -225,12 +250,14 @@ class ConcreteStrategyBIRCH_from_PYCLUSTERING(Strategy):
 class ConcreteStrategyCURE(Strategy):
 
     '''
-        @brief метод кластеризации пикселей с использованием cure из pyclustering.
+    Метод кластеризации пикселей с использованием CURE из pyclustering.
 
-        @param[in] self (obj): The current object.
-    	@param[in] pixels (list): the image represented by points.
+    Параметры:
+        pixels (list): Изображение, представленное списком пикселей.
+        params (list): Параметры для алгоритма кластеризации.
 
-    	@return (list) The label for everyone point.
+    Возвращает:
+        list: Метки кластеров для каждого пикселя.
     '''
     def clastering_image(self, pixels, params: []) -> str:
         instance = cure(data=pixels, number_cluster=int(params[0]),
@@ -239,13 +266,14 @@ class ConcreteStrategyCURE(Strategy):
         return np.array(self.clusters_to_labels(instance.get_clusters()))
 
     '''
-        @brief метод кластеризации точек с использованием cure из pyclustering.
+    Метод кластеризации точек с использованием CURE из pyclustering.
 
-        @param[in] self (obj): The current object.
-    	@param[in] points (list): the image represented by points.
-    	@param[in] params (list): the parameters for clustering.
+    Параметры:
+        points (list): Данные, представленные списком точек.
+        params (list): Параметры для алгоритма кластеризации.
 
-    	@return (list) The label for everyone point.
+    Возвращает:
+        list: Метки кластеров для каждой точки.
     '''
     def clastering_points(self, points, params):
         instance = cure(data=points.tolist(), number_cluster=int(params[0]),
@@ -256,12 +284,14 @@ class ConcreteStrategyCURE(Strategy):
 
 class ConcreteStrategyROCK(Strategy):
     '''
-        @brief метод кластеризации пикселей с использованием rock из pyclustering.
+    Метод кластеризации пикселей с использованием ROCK из pyclustering.
 
-        @param[in] self (obj): The current object.
-    	@param[in] pixels (list): the image represented by pixels.
+    Параметры:
+        pixels (list): Изображение, представленное списком пикселей.
+        params (list): Параметры для алгоритма кластеризации.
 
-    	@return (list) The label for everyone point.
+    Возвращает:
+        list: Метки кластеров для каждого пикселя.
     '''
     def clastering_image(self, pixels, params: []) -> str:
         instance = rock(data=pixels, eps=params[-1], number_clusters=int(params[0]), threshold=params[2], ccore=params[10])
@@ -270,13 +300,15 @@ class ConcreteStrategyROCK(Strategy):
         return labels
 
     '''
-        @brief метод кластеризации точек с использованием rock из pyclustering.
+    Метод кластеризации точек с использованием ROCK из pyclustering.
 
-        @param[in] self (obj): The current object.
-    	@param[in] points (list): the image represented by points.
-    	@param[in] params (list): the parameters for clustering.
+    Параметры:
+        points (list): Данные, представленные списком точек.
+        params (list): Параметры для алгоритма кластеризации.
 
-    	@return (list) The label for everyone point.
+    Возвращает:
+        list: Метки кластеров для каждой точки.
+
     '''
     def clastering_points(self, points,  params):
         instance = rock(data=points.tolist(), eps=params[-1], number_clusters=int(params[0]), threshold=params[2], ccore=params[10])
