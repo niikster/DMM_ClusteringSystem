@@ -42,7 +42,10 @@ class StrategyRunConfig:
         if key not in self._params:
             raise IndexError(f"config does not have field {key}")
 
-        return self._values[key]
+        if key in self._values:
+            return self._values[key]
+        
+        return self._params[key].default_value
 
     def __setitem__(self, key: str, val: int | float | str | bool):
         if key not in self._params:
@@ -51,8 +54,7 @@ class StrategyRunConfig:
         paramType = self._params[key]
 
         if not StrategyParamType.checkValIsExpected(paramType.param_type, val, switches=paramType.switches):
-            raise ValueError(f"config expected for field {key} type {
-                             paramType.param_type.name} but got {type(val)} ({val})")
+            raise ValueError(f"config expected for field {key} type {paramType.param_type.name} but got {type(val)} ({val})")
 
         self._values[key] = val
 
