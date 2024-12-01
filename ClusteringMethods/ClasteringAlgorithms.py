@@ -170,7 +170,6 @@ class Strategy(ABC):
     Конкретными Стратегиями.
     """
 
-    _params: Dict[str, StrategyParam] = dict()
     """
     @brief Хранит параметры настройки работы алгоритма
     """
