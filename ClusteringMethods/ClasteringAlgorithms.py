@@ -25,7 +25,7 @@ class StrategyParam:
     param_type: StrategyParamType
     switches: List[str]
     description: str
-    default_value: int | float | str | bool | None
+    default_value: int | float | str | bool
 
 
 class StrategyRunConfig:
@@ -188,7 +188,7 @@ class Strategy(ABC):
         pass
 
     @classmethod
-    def _addParam(cls, id: str, name: str, param_type: StrategyParamType, descr: str, default_value: int | float | str | bool | None = None, switches: List[str] = list()):
+    def _addParam(cls, id: str, name: str, param_type: StrategyParamType, descr: str, default_value: int | float | str | bool, switches: List[str] = list()):
         """Добавляет параметр настройки стратегии
 
         Args:
@@ -336,7 +336,7 @@ class ConcreteStrategyBIRCH_from_SKLEARN_LEARN(Strategy):
             Whether or not to compute labels for each fit""", True)
 
         cls._addParam("copy", "Copy data", StrategyParamType.Bool, """
-            Whether or not to make a copy of the given data""")
+            Whether or not to make a copy of the given data""", True)
 
     '''
         @brief метод кластеризации изображений с использованием birch из sklearn-learn.
@@ -397,6 +397,7 @@ class ConcreteStrategyBIRCH_from_PYCLUSTERING(Strategy):
             CF-entry diameter that used for CF-Tree construction""", 0.5)
         cls._addParam("type_measurement", "Type measurement", StrategyParamType.Switch,
                        """Type measurement used for calculation distance metrics""",
+                       "Euclidean",
                        switches=["Euclidean", "Manhattan", "Inter", "Intra", "Increase"])
         cls._addParam("entry_size_limit", "Entry size limit", StrategyParamType.UNumber,
                        """Maximum number of entries that can be stored in CF-Tree, if it is exceeded""",
