@@ -8,6 +8,8 @@
     "files": [
         "main.py",
         "Frameworks_interface/mainwindow.py",
+        "Frameworks_interface/strategy_options_dialog.py",
+        "Frameworks_interface/strategy_options_dialog.ui",
         "Frameworks_interface/form.ui",
         "Frameworks_interface/resource.qrc",
         "Frameworks_interface/SettingsApp.py",
