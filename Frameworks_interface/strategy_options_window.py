@@ -75,8 +75,8 @@ class StrategyOptionsDialog(QWidget):
                     fieldWidget = QSpinBox()
                     # У Python нет способа прямо узнать максимальное/минимальное значение int.
                     # Поэтому придумываем
-                    fieldWidget.setMinimum(-2**(ctypes.sizeof(ctypes.c_int) - 1) - 1)
-                    fieldWidget.setMaximum(2**(ctypes.sizeof(ctypes.c_int) - 1))
+                    fieldWidget.setMinimum(-2**(ctypes.sizeof(ctypes.c_int)) - 1)
+                    fieldWidget.setMaximum(2**(ctypes.sizeof(ctypes.c_int)) - 1)
                     val = self.__runConfig[paramId]
                     if not isinstance(val, int):
                         qDebug(f"Unexpected type {type(val).__name__} in field {paramId}")
@@ -85,7 +85,7 @@ class StrategyOptionsDialog(QWidget):
                 case StrategyParamType.UNumber:
                     fieldWidget = QSpinBox()
                     fieldWidget.setMinimum(0)
-                    fieldWidget.setMaximum(2**(ctypes.sizeof(ctypes.c_int)))
+                    fieldWidget.setMaximum(2**(ctypes.sizeof(ctypes.c_int)) - 1)
                     val = self.__runConfig[paramId]
                     if not isinstance(val, int):
                         qDebug(f"Unexpected type {type(val).__name__} in field {paramId}")
