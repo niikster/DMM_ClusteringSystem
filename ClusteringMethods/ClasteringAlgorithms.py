@@ -170,12 +170,13 @@ class Strategy(ABC):
     Конкретными Стратегиями.
     """
 
-    """
-    @brief Хранит параметры настройки работы алгоритма
-    """
-
     @classmethod
     def params(cls):
+        """Возвращает набор параметров метода кластеризации
+
+        Returns:
+            Dict[str, StrategyParam]: Набор параметров метода кластеризации
+        """
         return cls._params
 
     @classmethod
@@ -307,7 +308,7 @@ class StrategiesManager:
         if id in cls._strategies:
             return StrategyRunConfig(cls._strategies[id].strategyType.params())
         
-        return None # TODO: Переделать остальные страты на _setupParams
+        return None
 
 
 """
@@ -321,22 +322,24 @@ class ConcreteStrategyBIRCH_from_SKLEARN_LEARN(Strategy):
 
     @classmethod
     def _setupParams(cls):
-        cls._addParam("n_clusters", "Number of clusters", StrategyParamType.UNumber, """
-            Number of clusters after the final clustering step, which treats the
-            subclusters from the leaves as new samples""", 3)
+        cls._addParam("n_clusters", "Количество кластеров", StrategyParamType.UNumber, """
+            (Number of clusters) Количество кластеров после заключительного этапа кластеризации,
+            на котором подкластеры из листьев рассматриваются как новые образцы""", 3)
 
-        cls._addParam("branching_factor", "Branching factor", StrategyParamType.UNumber,
-                       """Maximum number of CF subclusters in each node""", 50)
+        cls._addParam("branching_factor", "Коэффициент ветвления", StrategyParamType.UNumber,
+            """(Branching factor) Максимальное число CF подкластеров в каждом узле""",
+            50)
 
-        cls._addParam("threshold", "Threshold", StrategyParamType.UFloating, """
-            The radius of the subcluster obtained by merging a new sample and the
-            closest subcluster should be lesser than the threshold""", 0.5)
+        cls._addParam("threshold", "Пороговая величина", StrategyParamType.UFloating, """
+            (Threshold) Радиус подкластера, полученного путем слияния новой выборки и ближайшего
+            подкластера, должен быть меньше порогового значения""", 0.5)
 
-        cls._addParam("compute_labels", "Comute labels", StrategyParamType.Bool, """
-            Whether or not to compute labels for each fit""", True)
+        cls._addParam("compute_labels", "Вычисление меток", StrategyParamType.Bool, """
+            (Compute labels) Следует ли вычислять метки для каждого соответствия или нет""",
+            True)
 
         cls._addParam("copy", "Copy data", StrategyParamType.Bool, """
-            Whether or not to make a copy of the given data""", True)
+            (Copy data) Следует ли делать копию предоставленных данных или нет""", True)
 
     '''
         @brief метод кластеризации изображений с использованием birch из sklearn-learn.
@@ -386,27 +389,30 @@ class ConcreteStrategyBIRCH_from_PYCLUSTERING(Strategy):
 
     @classmethod
     def _setupParams(cls):
-        cls._addParam("n_clusters", "Number of clusters", StrategyParamType.UNumber, """
-            Number of clusters after the final clustering step, which treats the
-            subclusters from the leaves as new samples""", 3)
-        cls._addParam("branching_factor", "Branching factor", StrategyParamType.UNumber,
-                       "Maximum number of CF subclusters in each node", 50)
-        cls._addParam("max_node_entries", "Maximum number of node entries", StrategyParamType.UNumber, """
-            Maximum number of entries that might be contained by each leaf node in CF-Tree""", 200)
-        cls._addParam("diameter", "CF-entry diameter", StrategyParamType.UFloating, """
-            CF-entry diameter that used for CF-Tree construction""", 0.5)
-        cls._addParam("type_measurement", "Type measurement", StrategyParamType.Switch,
-                       """Type measurement used for calculation distance metrics""",
-                       "Euclidean",
-                       switches=["Euclidean", "Manhattan", "Inter", "Intra", "Increase"])
-        cls._addParam("entry_size_limit", "Entry size limit", StrategyParamType.UNumber,
-                       """Maximum number of entries that can be stored in CF-Tree, if it is exceeded""",
-                       500)
-        cls._addParam("diameter_multiplier", "Diameter multiplier", StrategyParamType.Floating,
-                       """Multiplier that is used for increasing diameter when 'Entry size limit' is exceeded""",
-                       1.5)
-        cls._addParam("ccore", "Use C++", StrategyParamType.Bool, """
-            If true then C++ part of the library is used for processing""", True)
+        cls._addParam("n_clusters", "Количество кластеров", StrategyParamType.UNumber, """
+            (Number of clusters) Количество кластеров после заключительного этапа кластеризации,
+            на котором подкластеры из листьев рассматриваются как новые образцы""", 3)
+        cls._addParam("branching_factor", "Коэффициент ветвления", StrategyParamType.UNumber,
+            "(Branching factor) Максимальное число CF подкластеров в каждом узле", 50)
+        cls._addParam("max_node_entries", "Максимальное количество записей в узлах",
+            StrategyParamType.UNumber, """(Maximum number of node entries) Максимальное
+            количество записей, которые могут содержаться в каждом конечном узле CF-дерева""",
+            200)
+        cls._addParam("diameter", "Диаметр CF-записи", StrategyParamType.UFloating, """
+            (CF-entry diameter) Диаметр CF-записи, который используется для конструирования
+            CF-дерева""", 0.5)
+        cls._addParam("type_measurement", "Тип измерения", StrategyParamType.Switch,
+            """(Type measurement) Тип измерения, используемого для расчета показателей расстояния""",
+            "Euclidean",
+            switches=["Euclidean", "Manhattan", "Inter", "Intra", "Increase"])
+        cls._addParam("entry_size_limit", "Предельный размер записей", StrategyParamType.UNumber,
+            """(Entry size limit) Максимальное количество записей, которое может быть сохранено в
+            CF-дереве, если оно превышено""", 500)
+        cls._addParam("diameter_multiplier", "Множитель диаметра", StrategyParamType.Floating,
+            """Множитель, который используется для увеличения диаметра при превышении
+            "Предельного размера записей".""", 1.5)
+        cls._addParam("ccore", "Использовать C++", StrategyParamType.Bool, """
+            Если истинно, тогда используется C++ часть библиотеки для обработки""", True)
 
     """
         @brief метод кластеризации пикселей с использованием birch из pyclustering.
@@ -474,17 +480,16 @@ class ConcreteStrategyCURE(Strategy):
 
     @classmethod
     def _setupParams(cls):
-        cls._addParam("n_clusters", "Number of allocated clusters", StrategyParamType.UNumber,
-                       "Number of clusters to be allocated", 50)
-        cls._addParam("number_represent_points", "Number of representative points", StrategyParamType.UNumber,
-                       "Number of representative points for each cluster", 5)
-        cls._addParam("compression", "Compression", StrategyParamType.Floating,
-                       """
-            Coefficient defines level of shrinking of representation points toward
-            the mean of the new created cluster after merging on each step.
-            Usually it destributed from 0 to 1.""", 0.5)
-        cls._addParam("ccore", "Use C++", StrategyParamType.Bool, """
-            If true then C++ part of the library is used for processing""", True)
+        cls._addParam("n_clusters", "Количество выделенных кластеров", StrategyParamType.UNumber,
+            "(Number of allocated clusters) Количество кластеров для выделения", 50)
+        cls._addParam("number_represent_points", "Количество репрезентативных точек", StrategyParamType.UNumber,
+            "(Number of representative points) Количество репрезентативных точек для каждого кластера", 5)
+        cls._addParam("compression", "Сжатие", StrategyParamType.Floating,
+            """(Compression) Коэффициент определяет уровень уменьшения количества точек представления
+            по отношению к среднему значению вновь созданного кластера после объединения на каждом шаге.
+            Обычно находится в диапазоне от 0 до 1""", 0.5)
+        cls._addParam("ccore", "Использовать C++", StrategyParamType.Bool, """
+            Если истинно, тогда используется C++ часть библиотеки для обработки""", True)
 
     '''
         @brief метод кластеризации пикселей с использованием cure из pyclustering.
@@ -525,17 +530,17 @@ class ConcreteStrategyROCK(Strategy):
 
     @classmethod
     def _setupParams(cls):
-        cls._addParam("eps", "Connectivity radius (similarity threshold)", StrategyParamType.Floating,
-                       """Connectivity radius (similarity threshold), points are neighbors if distance between
-            them is less than connectivity radius.""", 2.0)
-        cls._addParam("n_clusters", "Number of clusters", StrategyParamType.UNumber,
-                       """Defines number of clusters that should be allocated from the input data set""",
-                       3)
-        cls._addParam("threshold", "Threshold", StrategyParamType.Floating, """
-            Value that defines degree of normalization that influences on choice of clusters for
-            merging during processing.""", 0.5)
-        cls._addParam("ccore", "Use C++", StrategyParamType.Bool, """
-            If true then C++ part of the library is used for processing""", True)
+        cls._addParam("eps", "Радиус соединения (порог сходства)", StrategyParamType.Floating,
+            """(Connectivity radius (similarity threshold)) Радиус соединения (порог сходства),
+            точки являются соседями, если дистанция между ними ниже радиуса соединения""", 2.0)
+        cls._addParam("n_clusters", "Количество кластеров", StrategyParamType.UNumber,
+            """(Number of clusters) Определяет число кластеров, которое должно быть выделено
+            из входного набора данных""", 3)
+        cls._addParam("threshold", "Пороговая величина", StrategyParamType.Floating, """
+            (Threshold) Значение, определяющее степень нормализации, которая влияет на выбор
+            кластеров для объединения во время обработки.""", 0.5)
+        cls._addParam("ccore", "Использовать C++", StrategyParamType.Bool, """
+            Если истинно, тогда используется C++ часть библиотеки для обработки""", True)
 
     '''
         @brief метод кластеризации пикселей с использованием rock из pyclustering.
