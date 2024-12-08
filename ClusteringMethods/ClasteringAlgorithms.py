@@ -8,6 +8,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum, auto
 import re
+import ctypes
 
 import numpy as np                      # pip install numpy
 from pyclustering.cluster.birch import birch
@@ -15,7 +16,7 @@ from pyclustering.cluster.cure import cure
 from pyclustering.cluster.rock import rock
 from pyclustering.container.cftree import measurement_type
 from sklearn.cluster import Birch       # pip install sklearn-learn
-from sklearn.cluster import DBSCAN
+from sklearn.cluster import DBSCAN, HDBSCAN
 from sklearn.cluster import SpectralBiclustering
 from sklearn.cluster import OPTICS
 from sklearn.mixture import GaussianMixture 
@@ -369,7 +370,7 @@ class ConcreteStrategyDBSCAN_from_SKLEARN(Strategy):
                       """
                       Число потоков для выполнения задачи (-1 для использования всех доступных).
                       """,
-                      None)
+                      1)
 
     def clastering_image(self, pixels: np.ndarray, params: StrategyRunConfig) -> np.ndarray:
         model = DBSCAN(eps=params["eps"], min_samples=params["min_samples"], metric=params["metric"], algorithm=params["algorithm"],
@@ -381,6 +382,124 @@ class ConcreteStrategyDBSCAN_from_SKLEARN(Strategy):
         leaf_size=params["leaf_size"], p=params["p"], n_jobs=params["n_jobs"])
         return model.fit_predict(points)
 
+@StrategiesManager.registerStrategy("hdbscan_sk", "HDBSCAN (SKLearn)")
+class ConcreteStrategyHDBSCAN_from_SKLEARN(Strategy):
+
+    @classmethod
+    def _setupParams(cls):
+        cls._addParam("min_cluster_size", "Минимальный размер кластера", StrategyParamType.UNumber,
+                      """
+                      Минимальное количество объектов в кластере.
+                      """,
+                      5)
+
+        cls._addParam("min_samples", "Минимальное количество объектов", StrategyParamType.UNumber,
+                      """
+                      Минимальное количество объектов в области плотности.
+                      """,
+                      5)
+
+        cls._addParam("cluster_selection_epsilon", "Порог выбора кластера", StrategyParamType.UFloating,
+                      """
+                      Дополнительный порог для выбора кластеров.
+                      """,
+                      0.0)
+
+        cls._addParam("max_cluster_size", "Максимальный размер кластера", StrategyParamType.UNumber,
+                      """
+                      Максимальный размер кластера.
+                      """,
+                      2**(ctypes.sizeof(ctypes.c_int)) - 1)
+
+        cls._addParam("metric", "Метрика", StrategyParamType.Switch,
+                      """
+                      Метрика для расчета расстояний: euclidean, manhattan и другие.
+                      """,
+                      "euclidean",
+                      switches=["euclidean", "manhattan", "chebyshev"])
+
+        cls._addParam("alpha", "Параметр альфа", StrategyParamType.UFloating,
+                      """
+                      Управляет уровнем плотности.
+                      """,
+                      1.0)
+
+        cls._addParam("algorithm", "Алгоритм", StrategyParamType.Switch,
+                      """
+                      Алгоритм для построения связей: auto, ball_tree, kd_tree, brute.
+                      """,
+                      "auto",
+                      switches=["auto", "ball_tree", "kd_tree", "brute"])
+
+        cls._addParam("leaf_size", "Размер листа", StrategyParamType.UNumber,
+                      """
+                      Размер листа для алгоритмов поиска.
+                      """,
+                      40)
+
+        cls._addParam("n_jobs", "Количество потоков", StrategyParamType.UNumber,
+                      """
+                      Количество потоков для выполнения задачи (-1 для всех доступных).
+                      """,
+                      1)
+
+        cls._addParam("cluster_selection_method", "Метод выбора кластера", StrategyParamType.Switch,
+                      """
+                      Метод: eom или leaf.
+                      """,
+                      "eom",
+                      switches=["eom", "leaf"])
+
+        cls._addParam("allow_single_cluster", "Разрешить один кластер", StrategyParamType.Bool,
+                      """
+                      Разрешить образование одного кластера.
+                      """,
+                      False)
+
+        cls._addParam("store_centers", "Сохранение центров", StrategyParamType.Switch,
+                      """
+                      Сохранять ли центры кластеров.
+                      """,
+                      "None",
+                      switches=["None", "centroid", "medoid", "both"])
+
+        cls._addParam("copy", "Копирование данных", StrategyParamType.Bool,
+                      """
+                      Делать ли копию входных данных.
+                      """,
+                      False)
+
+    def clastering_image(self, pixels: np.ndarray, params: StrategyRunConfig) -> np.ndarray:
+        model = HDBSCAN(min_cluster_size=params["min_cluster_size"],
+                        min_samples=params["min_samples"],
+                        cluster_selection_epsilon=params["cluster_selection_epsilon"],
+                        max_cluster_size=params["max_cluster_size"],
+                        metric=params["metric"],
+                        alpha=params["alpha"],
+                        algorithm=params["algorithm"],
+                        leaf_size=params["leaf_size"],
+                        n_jobs=params["n_jobs"],
+                        cluster_selection_method=params["cluster_selection_method"],
+                        allow_single_cluster=params["allow_single_cluster"],
+                        store_centers=None if params["store_centers"] == 'None' else params["store_centers"],
+                        copy=params["copy"])
+        return model.fit_predict(pixels)
+
+    def clastering_points(self, points: np.ndarray, params: StrategyRunConfig) -> np.ndarray:
+        model = HDBSCAN(min_cluster_size=params["min_cluster_size"],
+                        min_samples=params["min_samples"],
+                        cluster_selection_epsilon=params["cluster_selection_epsilon"],
+                        max_cluster_size=params["max_cluster_size"],
+                        metric=params["metric"],
+                        alpha=params["alpha"],
+                        algorithm=params["algorithm"],
+                        leaf_size=params["leaf_size"],
+                        n_jobs=params["n_jobs"],
+                        cluster_selection_method=params["cluster_selection_method"],
+                        allow_single_cluster=params["allow_single_cluster"],
+                        store_centers=None if params["store_centers"] == 'None' else params["store_centers"],
+                        copy=params["copy"])
+        return model.fit_predict(points)
     
 @StrategiesManager.registerStrategy("spectral_biclustering_sk", "Spectral Biclustering (SKLearn)")
 class ConcreteStrategySpectralBiclustering_from_SKLEARN(Strategy):
@@ -423,7 +542,7 @@ class ConcreteStrategySpectralBiclustering_from_SKLEARN(Strategy):
                       """
                       Максимальное число векторов для вычисления SVD.
                       """,
-                      None)
+                      0)
 
         cls._addParam("mini_batch", "Мини-пакетный режим", StrategyParamType.Bool,
                       """
@@ -442,7 +561,7 @@ class ConcreteStrategySpectralBiclustering_from_SKLEARN(Strategy):
                       """
                       Инициализация генератора случайных чисел.
                       """,
-                      None)
+                      0)
 
     def clastering_image(self, pixels: np.ndarray, params: StrategyRunConfig) -> np.ndarray:
         model = SpectralBiclustering(n_clusters=params["n_clusters"], method=params["method"], n_components=params["n_components"], 
@@ -500,7 +619,7 @@ class ConcreteStrategyOPTICS_from_SKLEARN(Strategy):
                       """
                       Максимальное расстояние между соседями для образования кластера.
                       """,
-                      None)
+                      float("inf"))
 
         cls._addParam("xi", "Порог для метода xi", StrategyParamType.UFloating,
                       """
@@ -518,7 +637,7 @@ class ConcreteStrategyOPTICS_from_SKLEARN(Strategy):
                       """
                       Минимальное число объектов в кластере.
                       """,
-                      None)
+                      5)
 
         cls._addParam("algorithm", "Алгоритм", StrategyParamType.Switch,
                       """
@@ -537,7 +656,7 @@ class ConcreteStrategyOPTICS_from_SKLEARN(Strategy):
                       """
                       Число потоков для выполнения задачи (-1 для использования всех доступных).
                       """,
-                      None)
+                      1)
 
     def clastering_image(self, pixels: np.ndarray, params: StrategyRunConfig) -> np.ndarray:
         model = OPTICS(min_samples=params["min_samples"], max_eps=params["max_eps"], metric=params["metric"],
@@ -607,7 +726,7 @@ class ConcreteStrategyGaussianMixture_from_SKLEARN(Strategy):
                       """
                       Инициализация генератора случайных чисел.
                       """,
-                      None)
+                      0)
 
         cls._addParam("warm_start", "Теплый старт", StrategyParamType.Bool,
                       """
