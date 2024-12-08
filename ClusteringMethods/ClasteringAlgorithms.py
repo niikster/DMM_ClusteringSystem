@@ -14,6 +14,8 @@ import numpy as np                      # pip install numpy
 from pyclustering.cluster.birch import birch
 from pyclustering.cluster.cure import cure
 from pyclustering.cluster.rock import rock
+from pyclustering.cluster.bang import bang
+
 from pyclustering.container.cftree import measurement_type
 from sklearn.cluster import Birch       # pip install sklearn-learn
 from sklearn.cluster import DBSCAN, HDBSCAN
@@ -426,10 +428,10 @@ class ConcreteStrategyHDBSCAN_from_SKLEARN(Strategy):
 
         cls._addParam("algorithm", "Алгоритм", StrategyParamType.Switch,
                       """
-                      Алгоритм для построения связей: auto, ball_tree, kd_tree, brute.
+                      Алгоритм для построения связей: auto, balltree, kdtree, brute.
                       """,
                       "auto",
-                      switches=["auto", "ball_tree", "kd_tree", "brute"])
+                      switches=["auto", "balltree", "kdtree", "brute"])
 
         cls._addParam("leaf_size", "Размер листа", StrategyParamType.UNumber,
                       """
@@ -1019,3 +1021,41 @@ class ConcreteStrategyROCK(Strategy):
         instance.process()
         x = instance.get_clusters()
         return np.array(self.clusters_to_labels(x))
+
+@StrategiesManager.registerStrategy("bang", "BANG")
+class ConcreteStrategyBANG(Strategy):
+    @classmethod
+    def _setupParams(cls):
+        cls._addParam("levels", "Количество уровней", StrategyParamType.UNumber,
+            """
+            Количество уровней в иерархии BANG.
+            """,
+            15)
+
+    def clastering_image(self, pixels: np.ndarray, params: StrategyRunConfig) -> np.ndarray:
+        # Создание и настройка объекта BANG
+        bang_instance = bang(data=pixels, 
+                             levels=params["levels"])
+        
+        # Выполнение кластеризации
+        bang_instance.process()
+        
+        # Получение меток кластеров
+        clusters = bang_instance.get_clusters()
+        
+        # Преобразование кластеров в метки
+        return np.array(self.clusters_to_labels(clusters))
+
+    def clastering_points(self, points: np.ndarray, params: StrategyRunConfig) -> np.ndarray:
+        # Создание и настройка объекта BANG
+        bang_instance = bang(data=points, 
+                             levels=params["levels"])
+        
+        # Выполнение кластеризации
+        bang_instance.process()
+        
+        # Получение меток кластеров
+        clusters = bang_instance.get_clusters()
+        
+        # Преобразование кластеров в метки
+        return np.array(self.clusters_to_labels(clusters))
