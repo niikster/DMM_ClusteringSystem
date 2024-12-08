@@ -15,6 +15,10 @@ from pyclustering.cluster.cure import cure
 from pyclustering.cluster.rock import rock
 from pyclustering.container.cftree import measurement_type
 from sklearn.cluster import Birch       # pip install sklearn-learn
+from sklearn.cluster import DBSCAN
+from sklearn.cluster import SpectralBiclustering
+from sklearn.cluster import OPTICS
+from sklearn.mixture import GaussianMixture 
 
 from typing import Dict, List
 
@@ -315,6 +319,329 @@ class StrategiesManager:
 Конкретные Стратегии реализуют алгоритм, следуя базовому интерфейсу Стратегии.
 Этот интерфейс делает их взаимозаменяемыми в Контексте.
 """
+
+@StrategiesManager.registerStrategy("dbscan_sk", "DBSCAN (SKLearn)")
+class ConcreteStrategyDBSCAN_from_SKLEARN(Strategy):
+
+    @classmethod
+    def _setupParams(cls):
+        cls._addParam("eps", "Максимальное расстояние между объектами", StrategyParamType.UFloating,
+                      """
+                      Максимальное расстояние между двумя объектами выборки,
+                      при котором один из них считается соседом другого.
+                      """,
+                      0.5)
+
+        cls._addParam("min_samples", "Минимальное количество объектов", StrategyParamType.UNumber,
+                      """
+                      Минимальное количество объектов в окрестности для того, чтобы точка считалась ядром.
+                      """,
+                      5)
+
+        cls._addParam("metric", "Метрика", StrategyParamType.Switch,
+                      """
+                      Метрика для расчета расстояния между объектами.
+                      Выбор: euclidean, manhattan, chebyshev, etc.
+                      """,
+                      "euclidean",
+                      switches=["euclidean", "manhattan", "chebyshev"])
+
+        cls._addParam("algorithm", "Алгоритм", StrategyParamType.Switch,
+                      """
+                      Алгоритм вычисления расстояний: auto, ball_tree, kd_tree, brute.
+                      """,
+                      "auto",
+                      switches=["auto", "ball_tree", "kd_tree", "brute"])
+
+        cls._addParam("leaf_size", "Размер листа", StrategyParamType.UNumber,
+                      """
+                      Параметр, влияющий на скорость построения и запросов к дереву.
+                      """,
+                      30)
+
+        cls._addParam("p", "Степень Minkowski", StrategyParamType.Floating,
+                      """
+                      Степень для метрики Minkowski.
+                      """,
+                      2.0)
+
+        cls._addParam("n_jobs", "Количество потоков", StrategyParamType.UNumber,
+                      """
+                      Число потоков для выполнения задачи (-1 для использования всех доступных).
+                      """,
+                      None)
+
+    def clastering_image(self, pixels: np.ndarray, params: StrategyRunConfig) -> np.ndarray:
+        model = DBSCAN(eps=params["eps"], min_samples=params["min_samples"], metric=params["metric"], algorithm=params["algorithm"],
+        leaf_size=params["leaf_size"], p=params["p"], n_jobs=params["n_jobs"])
+        return model.fit_predict(pixels)
+
+    def clastering_points(self, points: np.ndarray, params: StrategyRunConfig) -> np.ndarray:
+        model = DBSCAN(eps=params["eps"], min_samples=params["min_samples"], metric=params["metric"], algorithm=params["algorithm"],
+        leaf_size=params["leaf_size"], p=params["p"], n_jobs=params["n_jobs"])
+        return model.fit_predict(points)
+
+    
+@StrategiesManager.registerStrategy("spectral_biclustering_sk", "Spectral Biclustering (SKLearn)")
+class ConcreteStrategySpectralBiclustering_from_SKLEARN(Strategy):
+
+    @classmethod
+    def _setupParams(cls):
+        cls._addParam("n_clusters", "Количество кластеров", StrategyParamType.UNumber,
+                      """
+                      Количество кластеров для выделения.
+                      """,
+                      3)
+
+        cls._addParam("method", "Метод", StrategyParamType.Switch,
+                      """
+                      Метод выбора: scale, log, logit.
+                      """,
+                      "bistochastic",
+                      switches=["scale", "log", "logit", "bistochastic"])
+
+        cls._addParam("n_components", "Количество компонент", StrategyParamType.UNumber,
+                      """
+                      Количество компонент для анализа.
+                      """,
+                      6)
+
+        cls._addParam("n_best", "Количество лучших компонент", StrategyParamType.UNumber,
+                      """
+                      Количество лучших компонент для возврата.
+                      """,
+                      3)
+
+        cls._addParam("svd_method", "Метод SVD", StrategyParamType.Switch,
+                      """
+                      Метод SVD: randomized, arpack.
+                      """,
+                      "randomized",
+                      switches=["randomized", "arpack"])
+
+        cls._addParam("n_svd_vecs", "Количество векторов SVD", StrategyParamType.UNumber,
+                      """
+                      Максимальное число векторов для вычисления SVD.
+                      """,
+                      None)
+
+        cls._addParam("mini_batch", "Мини-пакетный режим", StrategyParamType.Bool,
+                      """
+                      Использовать мини-пакетный режим для ускорения вычислений.
+                      """,
+                      False)
+
+        cls._addParam("init", "Метод инициализации", StrategyParamType.Switch,
+                      """
+                      Метод инициализации: k-means++, random.
+                      """,
+                      "k-means++",
+                      switches=["k-means++", "random"])
+
+        cls._addParam("random_state", "Состояние случайности", StrategyParamType.UNumber,
+                      """
+                      Инициализация генератора случайных чисел.
+                      """,
+                      None)
+
+    def clastering_image(self, pixels: np.ndarray, params: StrategyRunConfig) -> np.ndarray:
+        model = SpectralBiclustering(n_clusters=params["n_clusters"], method=params["method"], n_components=params["n_components"], 
+                                     n_best=params["n_best"], svd_method=params["svd_method"], n_svd_vecs=params["n_svd_vecs"], 
+                                     mini_batch=params["mini_batch"], init=params["init"], random_state=params["random_state"])
+        model.fit(pixels)
+        return model.row_labels_
+
+    def clastering_points(self, points: np.ndarray, params: StrategyRunConfig) -> np.ndarray:
+        model = SpectralBiclustering(n_clusters=params["n_clusters"], method=params["method"], n_components=params["n_components"], 
+                                     n_best=params["n_best"], svd_method=params["svd_method"], n_svd_vecs=params["n_svd_vecs"], 
+                                     mini_batch=params["mini_batch"], init=params["init"], random_state=params["random_state"])
+        model.fit(points)
+        return model.row_labels_
+
+    
+@StrategiesManager.registerStrategy("optics_sk", "OPTICS (SKLearn)")
+class ConcreteStrategyOPTICS_from_SKLEARN(Strategy):
+
+    @classmethod
+    def _setupParams(cls):
+        cls._addParam("min_samples", "Минимальное количество объектов", StrategyParamType.UNumber,
+                      """
+                      Минимальное количество объектов в окрестности для формирования кластера.
+                      """,
+                      5)
+
+        cls._addParam("max_eps", "Максимальное расстояние", StrategyParamType.UFloating,
+                      """
+                      Максимальное расстояние между двумя объектами для включения в один кластер.
+                      """,
+                      float("inf"))
+
+        cls._addParam("metric", "Метрика", StrategyParamType.Switch,
+                      """
+                      Метрика для расчета расстояния между объектами.
+                      """,
+                      "minkowski",
+                      switches=["euclidean", "manhattan", "minkowski"])
+
+        cls._addParam("p", "Степень Minkowski", StrategyParamType.Floating,
+                      """
+                      Степень для метрики Minkowski.
+                      """,
+                      2.0)
+
+        cls._addParam("cluster_method", "Метод кластеризации", StrategyParamType.Switch,
+                      """
+                      Метод: dbscan или xi.
+                      """,
+                      "xi",
+                      switches=["xi", "dbscan"])
+
+        cls._addParam("eps", "Пороговое значение для кластеризации", StrategyParamType.UFloating,
+                      """
+                      Максимальное расстояние между соседями для образования кластера.
+                      """,
+                      None)
+
+        cls._addParam("xi", "Порог для метода xi", StrategyParamType.UFloating,
+                      """
+                      Уровень значимости для метода xi.
+                      """,
+                      0.05)
+
+        cls._addParam("predecessor_correction", "Коррекция предшественников", StrategyParamType.Bool,
+                      """
+                      Корректировать предшественников для метода xi.
+                      """,
+                      True)
+
+        cls._addParam("min_cluster_size", "Минимальный размер кластера", StrategyParamType.UFloating,
+                      """
+                      Минимальное число объектов в кластере.
+                      """,
+                      None)
+
+        cls._addParam("algorithm", "Алгоритм", StrategyParamType.Switch,
+                      """
+                      Алгоритм вычисления расстояний: auto, ball_tree, kd_tree, brute.
+                      """,
+                      "auto",
+                      switches=["auto", "ball_tree", "kd_tree", "brute"])
+
+        cls._addParam("leaf_size", "Размер листа", StrategyParamType.UNumber,
+                      """
+                      Размер листа, влияющий на производительность.
+                      """,
+                      30)
+
+        cls._addParam("n_jobs", "Количество потоков", StrategyParamType.UNumber,
+                      """
+                      Число потоков для выполнения задачи (-1 для использования всех доступных).
+                      """,
+                      None)
+
+    def clastering_image(self, pixels: np.ndarray, params: StrategyRunConfig) -> np.ndarray:
+        model = OPTICS(min_samples=params["min_samples"], max_eps=params["max_eps"], metric=params["metric"],
+                       p=params["p"], cluster_method=params["cluster_method"], eps=params["eps"], xi=params["xi"], 
+                       predecessor_correction=params["predecessor_correction"], min_cluster_size=params["min_cluster_size"], 
+                       algorithm=params["algorithm"], leaf_size=params["leaf_size"], n_jobs=params["n_jobs"])
+        return model.fit_predict(pixels)
+
+    def clastering_points(self, points: np.ndarray, params: StrategyRunConfig) -> np.ndarray:
+        model = OPTICS(min_samples=params["min_samples"], max_eps=params["max_eps"], metric=params["metric"],
+                       p=params["p"], cluster_method=params["cluster_method"], eps=params["eps"], xi=params["xi"], 
+                       predecessor_correction=params["predecessor_correction"], min_cluster_size=params["min_cluster_size"], 
+                       algorithm=params["algorithm"], leaf_size=params["leaf_size"], n_jobs=params["n_jobs"])
+        return model.fit_predict(points)
+
+
+@StrategiesManager.registerStrategy("gaussian_mixture_sk", "Gaussian Mixture (SKLearn)")
+class ConcreteStrategyGaussianMixture_from_SKLEARN(Strategy):
+
+    @classmethod
+    def _setupParams(cls):
+        cls._addParam("n_components", "Количество компонент", StrategyParamType.UNumber,
+                      """
+                      Количество компонент (кластеров).
+                      """,
+                      3)
+
+        cls._addParam("covariance_type", "Тип ковариации", StrategyParamType.Switch,
+                      """
+                      Тип ковариации: full, tied, diag, spherical.
+                      """,
+                      "full",
+                      switches=["full", "tied", "diag", "spherical"])
+
+        cls._addParam("tol", "Допустимая ошибка сходимости", StrategyParamType.UFloating,
+                      """
+                      Минимальная ошибка сходимости для остановки EM алгоритма.
+                      """,
+                      1e-3)
+
+        cls._addParam("reg_covar", "Регуляризация ковариации", StrategyParamType.UFloating,
+                      """
+                      Добавочная ковариация для обеспечения численной стабильности.
+                      """,
+                      1e-6)
+
+        cls._addParam("max_iter", "Максимальное количество итераций", StrategyParamType.UNumber,
+                      """
+                      Максимальное количество итераций EM алгоритма.
+                      """,
+                      100)
+
+        cls._addParam("n_init", "Количество инициализаций", StrategyParamType.UNumber,
+                      """
+                      Число начальных запусков алгоритма.
+                      """,
+                      1)
+
+        cls._addParam("init_params", "Метод инициализации", StrategyParamType.Switch,
+                      """
+                      Метод инициализации: kmeans, k-means++, random, random_from_data.
+                      """,
+                      "kmeans",
+                      switches=["kmeans", "k-means++", "random", "random_from_data"])
+
+        cls._addParam("random_state", "Состояние случайности", StrategyParamType.UNumber,
+                      """
+                      Инициализация генератора случайных чисел.
+                      """,
+                      None)
+
+        cls._addParam("warm_start", "Теплый старт", StrategyParamType.Bool,
+                      """
+                      Рестарт алгоритма с текущих параметров модели.
+                      """,
+                      False)
+
+        cls._addParam("verbose", "Уровень логирования", StrategyParamType.UNumber,
+                      """
+                      Уровень логирования.
+                      """,
+                      0)
+
+        cls._addParam("verbose_interval", "Интервал логирования", StrategyParamType.UNumber,
+                      """
+                      Частота логирования.
+                      """,
+                      10)
+
+    def clastering_image(self, pixels: np.ndarray, params: StrategyRunConfig) -> np.ndarray:
+        model = GaussianMixture(n_components=params["n_components"], covariance_type=params["covariance_type"], 
+                                tol=params["tol"], reg_covar=params["reg_covar"], max_iter=params["max_iter"], 
+                                n_init=params["n_init"], init_params=params["init_params"], random_state=params["random_state"],
+                                warm_start=params["warm_start"], verbose=params["verbose"], verbose_interval=params["verbose_interval"])
+        model.fit(pixels)
+        return model.predict(pixels)
+
+    def clastering_points(self, points: np.ndarray, params: StrategyRunConfig) -> np.ndarray:
+        model = GaussianMixture(n_components=params["n_components"], covariance_type=params["covariance_type"],
+                                tol=params["tol"], reg_covar=params["reg_covar"], max_iter=params["max_iter"],
+                                n_init=params["n_init"], init_params=params["init_params"], random_state=params["random_state"],
+                                warm_start=params["warm_start"], verbose=params["verbose"], verbose_interval=params["verbose_interval"])
+        model.fit(points)
+        return model.predict(points)
 
 
 @StrategiesManager.registerStrategy("birch_sk", "BIRCH (SKLearn)")
