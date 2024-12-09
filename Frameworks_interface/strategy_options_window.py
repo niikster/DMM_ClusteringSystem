@@ -1,5 +1,4 @@
 import sys
-import ctypes
 
 from PySide6.QtCore import Signal, Slot, qDebug
 from PySide6.QtGui import Qt
@@ -8,6 +7,8 @@ from PySide6.QtWidgets import QCheckBox, QComboBox, QDoubleSpinBox, QHBoxLayout,
 from ClusteringMethods.ClasteringAlgorithms import StrategiesManager, StrategyParamType, StrategyRunConfig
 
 from .ui_strategy_options_dialog import Ui_StrategyOptionsDialog
+
+import numpy as np # Чисто ради получения размера int'а. Да
 
 from typing import Dict, Optional, Tuple, Union
 
@@ -75,8 +76,8 @@ class StrategyOptionsDialog(QWidget):
                     fieldWidget = QSpinBox()
                     # У Python нет способа прямо узнать максимальное/минимальное значение int.
                     # Поэтому придумываем
-                    fieldWidget.setMinimum(-2**(ctypes.sizeof(ctypes.c_int) * 8 - 1) - 1)
-                    fieldWidget.setMaximum(2**(ctypes.sizeof(ctypes.c_int) * 8 - 1) - 1)
+                    fieldWidget.setMinimum(np.iinfo(np.int32).min)
+                    fieldWidget.setMaximum(np.iinfo(np.int32).max)
                     val = self.__runConfig[paramId]
                     if not isinstance(val, int):
                         qDebug(f"Unexpected type {type(val).__name__} in field {paramId}")
@@ -85,7 +86,7 @@ class StrategyOptionsDialog(QWidget):
                 case StrategyParamType.UNumber:
                     fieldWidget = QSpinBox()
                     fieldWidget.setMinimum(0)
-                    fieldWidget.setMaximum(2**(ctypes.sizeof(ctypes.c_int) * 8 - 1) - 1)
+                    fieldWidget.setMaximum(np.iinfo(np.int32).max)
                     val = self.__runConfig[paramId]
                     if not isinstance(val, int):
                         qDebug(f"Unexpected type {type(val).__name__} in field {paramId}")
