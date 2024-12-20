@@ -291,10 +291,25 @@ class StrategyDescription:
 
 
 class StrategiesManager:
+    """Класс управления стратегиями
+
+    Данный класс хранит в себе информацию об имеющихся стратегиях кластеризации. Для 
+    регистрации новой стратегии необходимо воспользоваться декоратором registerStrategy.
+
+    Имея информацию о стратегии, экземпляр данного класса может создать новый экземпляр
+    стратегии кластеризации, и создать экземпляр настроек запуска необходимой стратегии
+    кластеризации.
+    """
+
     _strategies: Dict[str, StrategyDescription] = dict()
 
     @classmethod
     def strategies(cls):
+        """Получить хранимые данные о стратегиях
+
+        Возвращает:
+            Dict[str, StrategyDescription]: Хранимые данные о стратегиях
+        """
         return cls._strategies
 
     @classmethod
@@ -325,7 +340,16 @@ class StrategiesManager:
         return _innerDecor
 
     @classmethod
-    def createStrategyById(cls, id) -> Strategy | None:
+    def createStrategyById(cls, id: str) -> Strategy | None:
+        """Создаёт экземпляр класса стратегии кластеризации по его идентификатору
+
+        Аргументы:
+            id (str): Идентификатор класса стратегии кластеризации
+
+        Возвращает:
+            Strategy | None: Возвращает экземпляр запрошенного класса, либо ничего, если по
+                             данному идентификатору не было найдено информации о регистрации
+        """
         if id in cls._strategies:
             return cls._strategies[id].strategyType()
 
@@ -333,6 +357,11 @@ class StrategiesManager:
 
     @classmethod
     def strategiesCount(cls) -> int:
+        """Возвращает количество зарегистрированных стратегий
+
+        Возвращает:
+            int: Количество зарегистрированных стратегий
+        """
         return len(cls._strategies)
 
     @classmethod
