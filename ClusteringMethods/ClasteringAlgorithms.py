@@ -1,6 +1,7 @@
 # Authors:
 #       Mineev S. A. [mineeff20@yandex.ru]
 #       Meshkova O. V. [oxn.lar5@yandex.ru]
+#       Asanov Y. V. [yaroslav.asanov@yandex.ru]
 
 from __future__ import annotations
 from abc import ABC, abstractmethod
