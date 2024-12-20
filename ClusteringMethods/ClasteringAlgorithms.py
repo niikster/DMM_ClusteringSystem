@@ -96,42 +96,60 @@ class Context:
         self._strategy = strategy
 
     def do_some_clustering_image(self, pixels: np.ndarray, params: StrategyRunConfig, i) -> np.ndarray:
-        """
-        Вместо того, чтобы самостоятельно реализовывать множественные версии
-        алгоритма, Контекст делегирует некоторую работу объекту Стратегии.
-        """
-        if i > 0:
-            # Извлечение координат и цветов всех пикселей в формате HSV
-            coords_and_colors = [
-                (x, y, pixels[y, x])
-                for y in range(pixels.shape[0])
-                for x in range(pixels.shape[1])
-            ]
-            # Преобразование координат и цветов в двумерный массив для кластеризации
-            # X = np.array([[h, s, v] for (_, _, (h, s, v)) in coords_and_colors])
-            X = [[float(h), float(s), float(v)]
-                 for (_, _, (h, s, v)) in coords_and_colors]
-            # ------------------------------------------------------------------------------------- #
-            labels = self._strategy.clastering_image(X, params)
-            # ------------------------------------------------------------------------------------- #
-            # Визуализация результата кластеризации
-            colors = [
-                (255, 0, 0),
-                (0, 255, 0),
-                (0, 0, 255),
-                (255, 255, 0),
-                (255, 0, 255),
-                (0, 255, 255),
-            ]
-            clustered_image = np.zeros_like(pixels)
-            for index, (x, y, _) in enumerate(coords_and_colors):
-                clustered_image[y, x] = colors[labels[index] % len(colors)]
-        else:
-            # None(used Rashape)
-            labels = self._strategy.clastering_image(pixels.tolist(), params)
-        return labels
+            """Выполняет кластеризацию изображения.
+
+            Вместо того, чтобы самостоятельно реализовывать множественные версии
+            алгоритма, Контекст делегирует некоторую работу объекту Стратегии.
+
+            Аргументы:
+                pixels (np.ndarray): Массив пикселей изображения.
+                params StrategyRunConfig: Параметры для алгоритма кластеризации.
+                i: Флаг, определяющий метод обработки.
+
+            Возвращает:
+                (np.ndarray) Метки кластеров для каждого пикселя.
+            """
+            if i > 0:
+                # Извлечение координат и цветов всех пикселей в формате HSV
+                coords_and_colors = [
+                    (x, y, pixels[y, x])
+                    for y in range(pixels.shape[0])
+                    for x in range(pixels.shape[1])
+                ]
+                # Преобразование координат и цветов в двумерный массив для кластеризации
+                # X = np.array([[h, s, v] for (_, _, (h, s, v)) in coords_and_colors])
+                X = [[float(h), float(s), float(v)] for (_, _, (h, s, v)) in coords_and_colors]
+                # ------------------------------------------------------------------------------------- #
+                labels = self._strategy.clastering_image(X, params)
+                # ------------------------------------------------------------------------------------- #
+                # Визуализация результата кластеризации
+                colors = [
+                    (255, 0, 0),
+                    (0, 255, 0),
+                    (0, 0, 255),
+                    (255, 255, 0),
+                    (255, 0, 255),
+                    (0, 255, 255),
+                ]
+                clustered_image = np.zeros_like(pixels)
+                for index, (x, y, _) in enumerate(coords_and_colors):
+                    clustered_image[y, x] = colors[labels[index] % len(colors)]
+            else: 
+                # None(used Rashape)
+                labels = self._strategy.clastering_image(pixels.tolist(), params)
+            return labels
 
     def do_some_clustering_points(self, data, params: StrategyRunConfig) -> np.ndarray:
+        """
+        Выполняет кластеризацию точек.
+
+        Аргументы:
+            data: Входные данные в виде списка точек.
+            params (StrategyRunConfig): Параметры для алгоритма кластеризации.
+
+        Возвращает:
+            (np.ndarray) Метки кластеров для каждой точки.
+        """        
         fitchs = np.array(data, dtype=float)
         points = fitchs.transpose()
         if isinstance(self._strategy, ConcreteStrategyBIRCH_from_SKLEARN_LEARN):
@@ -181,7 +199,7 @@ class Strategy(ABC):
     def params(cls):
         """Возвращает набор параметров метода кластеризации
 
-        Returns:
+        Возвращает:
             Dict[str, StrategyParam]: Набор параметров метода кластеризации
         """
         return cls._params
@@ -199,7 +217,7 @@ class Strategy(ABC):
     def _addParam(cls, id: str, name: str, param_type: StrategyParamType, descr: str, default_value: int | float | str | bool, switches: List[str] = list()):
         """Добавляет параметр настройки стратегии
 
-        Args:
+        Аргументы:
             id (str): Идентификатор параметра, передаваемого объекта настройки стратегии (см. StrategyRunConfig)
             name (str): Человеко-читаемое имя параметра
             param_type (StrategyParamType): Тип значения параметра
@@ -208,7 +226,7 @@ class Strategy(ABC):
                              для численных и первое значение из параметра с выбором из опций.
             switches (List[str], optional): Возможные значения параметра с типа "Выбор из нескольких". По умолчанию список пустой.
 
-        Raises:
+        Исключения:
             ValueError: Возникает при попытке установить возможный параметр типа StrategyParamType.Switch без единого возможного значения
         """
 
@@ -235,9 +253,15 @@ class Strategy(ABC):
         pass
 
     def clusters_to_labels(self, clusters) -> List:
+        """Метод преобразование cluster_index in labels для BIRCH из sklearn-learn.
+
+        Аргументы:
+            clusters (list): Список кластеров, где каждый кластер содержит индексы точек.
+        
+        Возвращает:
+            (list) Список меток для каждой точки.
         """
-        @brief Метод преобразования cluster_index in labels для birch из sklearn-learn.
-        """
+
         size = sum(map(lambda x: len(x), clusters))
         labels = [0] * size
         for cluster_index in range(len(clusters)):
@@ -276,13 +300,13 @@ class StrategiesManager:
     def registerStrategy(cls, id: str, ui_name: str, description=""):
         """Декоратор для регистрации стратегии
 
-        Args:
+        Аргументы:
             id (str): Идентификатор стратегии. При помощи него в дальнейшем можно
                       создать новый экземпляр стратегии
             ui_name (str): Человеко-читаемое название стратегии
             description (str, optional): Описание стратегии. По умолчанию не задано.
 
-        Raises:
+        Исключения:
             TypeError: Возникает при попытке добавить стратегию по уже занятому ID.
         """
 
@@ -767,6 +791,8 @@ class ConcreteStrategyGaussianMixture_from_SKLEARN(Strategy):
 
 @StrategiesManager.registerStrategy("birch_sk", "BIRCH (SKLearn)")
 class ConcreteStrategyBIRCH_from_SKLEARN_LEARN(Strategy):
+    """Метод кластеризации точек с использованием BIRCH из SKLearn.
+    """
 
     @classmethod
     def _setupParams(cls):
@@ -789,16 +815,6 @@ class ConcreteStrategyBIRCH_from_SKLEARN_LEARN(Strategy):
         cls._addParam("copy", "Copy data", StrategyParamType.Bool, """
             (Copy data) Следует ли делать копию предоставленных данных или нет""", True)
 
-    '''
-        @brief метод кластеризации изображений с использованием birch из sklearn-learn.
-
-        @param[in] self (obj): The current object.
-        @param[in] pixels (list): the image represented by pixels.
-        @param[in] params (list): the parameters for clustering.
-
-        @return (list) The label for everyone pixel.
-    '''
-
     def clastering_image(self, pixels: np.ndarray, params: StrategyRunConfig) -> np.ndarray:
         # Создание и обучение объекта BIRCH
         birch1 = Birch(n_clusters=int(params["n_clusters"]), branching_factor=int(params["branching_factor"]),
@@ -808,15 +824,6 @@ class ConcreteStrategyBIRCH_from_SKLEARN_LEARN(Strategy):
 
         # Получение меток кластеров для каждой точки
         return birch1.predict(pixels)
-
-    '''
-        @brief метод кластеризации точек с использованием birch из sklearn-learn.
-
-        @param[in] self (obj): The current object.
-    	@param[in] points (list): the image represented by points.
-
-    	@return (list) The label for everyone point.
-    '''
 
     def clastering_points(self, points: np.ndarray, params: StrategyRunConfig) -> np.ndarray:
         # Создание и обучение объекта BIRCH
@@ -834,6 +841,8 @@ class ConcreteStrategyBIRCH_from_SKLEARN_LEARN(Strategy):
 
 @StrategiesManager.registerStrategy("birch_pyc", "BIRCH (PyClustering)")
 class ConcreteStrategyBIRCH_from_PYCLUSTERING(Strategy):
+    """Метод кластеризации точек с использованием BIRCH из pyclustering.
+    """
 
     @classmethod
     def _setupParams(cls):
@@ -862,15 +871,6 @@ class ConcreteStrategyBIRCH_from_PYCLUSTERING(Strategy):
         cls._addParam("ccore", "Использовать C++", StrategyParamType.Bool, """
             Если истинно, тогда используется C++ часть библиотеки для обработки""", True)
 
-    """
-        @brief метод кластеризации пикселей с использованием birch из pyclustering.
-
-        @param[in] self (obj): The current object.
-    	@param[in] points (list): the image represented by pixels.
-
-    	@return (list) The label for everyone point.
-    """
-
     def clastering_image(self, pixels: np.ndarray, params: StrategyRunConfig) -> np.ndarray:
         typeMeasurement = self.TYPE(params["type_measurement"])
         instance = birch(data=pixels, number_clusters=int(params["n_clusters"]), branching_factor=int(params["branching_factor"]),
@@ -878,16 +878,6 @@ class ConcreteStrategyBIRCH_from_PYCLUSTERING(Strategy):
                          entry_size_limit=int(params["entry_size_limit"]), diameter_multiplier=float(params["diameter_multiplier"]), ccore=bool(params["ccore"]))
         instance.process()
         return np.array(self.clusters_to_labels(instance.get_clusters()))
-
-    '''
-        @brief метод кластеризации точек с использованием birch из pyclustering.
-
-        @param[in] self (obj): The current object.
-    	@param[in] points (list): the image represented by points.
-    	@param[in] params (list): the parameters for clustering.
-
-    	@return (list) The label for everyone point.
-    '''
 
     def clastering_points(self, points, params):
         typeMeasurement = self.TYPE(params["type_measurement"])
@@ -897,16 +887,17 @@ class ConcreteStrategyBIRCH_from_PYCLUSTERING(Strategy):
         instance.process()
         return np.array(self.clusters_to_labels(instance.get_clusters()))
 
-    '''
-        @brief метод, определяющий тип метрики для birch из pyclustering.
 
-        @param[in] self (obj): The current object.
-    	@param[in] param (list): the index metric from mainwindow.py.
+    def TYPE(self, param: str):
+        """Метод, определяющий тип метрики для BIRCH из pyclustering.
 
-    	@return (measurement_type: int) The type metric.
-    '''
+        Параметры:
+            param (str): Название метрики, выбранное пользователем.
 
-    def TYPE(self, param):
+        Возвращает:
+            int: Тип метрики для алгоритма кластеризации.
+        """
+        
         match param:
             case 'Euclidean':
                 type = measurement_type.CENTROID_EUCLIDEAN_DISTANCE
@@ -926,6 +917,9 @@ class ConcreteStrategyBIRCH_from_PYCLUSTERING(Strategy):
 @StrategiesManager.registerStrategy("cure", "CURE")
 class ConcreteStrategyCURE(Strategy):
 
+    """Метод кластеризации пикселей с использованием CURE из pyclustering.
+    """
+
     @classmethod
     def _setupParams(cls):
         cls._addParam("n_clusters", "Количество выделенных кластеров", StrategyParamType.UNumber,
@@ -939,31 +933,12 @@ class ConcreteStrategyCURE(Strategy):
         cls._addParam("ccore", "Использовать C++", StrategyParamType.Bool, """
             Если истинно, тогда используется C++ часть библиотеки для обработки""", True)
 
-    '''
-        @brief метод кластеризации пикселей с использованием cure из pyclustering.
-
-        @param[in] self (obj): The current object.
-        @param[in] pixels (list): the image represented by points.
-
-        @return (list) The label for every point.
-    '''
-
     def clastering_image(self, pixels: np.ndarray, params: StrategyRunConfig) -> np.ndarray:
         instance = cure(data=pixels, number_cluster=int(params["n_clusters"]),
                         number_represent_points=int(params["number_represent_points"]),
                         compression=float(params["compression"]), ccore=bool(params["ccore"]))
         instance.process()
         return np.array(self.clusters_to_labels(instance.get_clusters()))
-
-    '''
-        @brief метод кластеризации точек с использованием cure из pyclustering.
-
-        @param[in] self (obj): The current object.
-    	@param[in] points (list): the image represented by points.
-    	@param[in] params (list): the parameters for clustering.
-
-    	@return (list) The label for everyone point.
-    '''
 
     def clastering_points(self, points: np.ndarray, params: StrategyRunConfig) -> np.ndarray:
         instance = cure(data=points.tolist(), number_cluster=int(params["n_clusters"]),
@@ -975,6 +950,9 @@ class ConcreteStrategyCURE(Strategy):
 
 @StrategiesManager.registerStrategy("rock", "ROCK")
 class ConcreteStrategyROCK(Strategy):
+
+    """Метод кластеризации пикселей с использованием ROCK из pyclustering.
+    """
 
     @classmethod
     def _setupParams(cls):
@@ -990,30 +968,11 @@ class ConcreteStrategyROCK(Strategy):
         cls._addParam("ccore", "Использовать C++", StrategyParamType.Bool, """
             Если истинно, тогда используется C++ часть библиотеки для обработки""", True)
 
-    '''
-        @brief метод кластеризации пикселей с использованием rock из pyclustering.
-
-        @param[in] self (obj): The current object.
-        @param[in] pixels (list): the image represented by pixels.
-
-        @return (list) The label for every point.
-    '''
-
     def clastering_image(self, pixels: np.ndarray, params: StrategyRunConfig) -> np.ndarray:
         instance = rock(data=pixels, eps=params["eps"], number_clusters=int(params["n_clusters"]),
                         threshold=float(params["threshold"]), ccore=bool(params["ccore"]))
         instance.process()
         return np.array(self.clusters_to_labels(instance.get_clusters()))
-
-    '''
-        @brief метод кластеризации точек с использованием rock из pyclustering.
-
-        @param[in] self (obj): The current object.
-    	@param[in] points (list): the image represented by points.
-    	@param[in] params (list): the parameters for clustering.
-
-    	@return (list) The label for every point.
-    '''
 
     def clastering_points(self, points: np.ndarray, params: StrategyRunConfig):
         instance = rock(data=points.tolist(), eps=params["eps"], number_clusters=int(params["n_clusters"]),
