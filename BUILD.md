@@ -11,3 +11,5 @@ pyside6-project build ClustSystem.pyproject
 ```bash
 pyside6-project run ClustSystem.pyproject
 ```
+
+В качестве альтернативы возможно использование IDE Qt Creator.
