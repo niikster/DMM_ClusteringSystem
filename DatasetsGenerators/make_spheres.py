@@ -6,6 +6,21 @@ import matplotlib.pyplot as plt
 from math import pi, sin, ceil
 
 def make_spheres(n_samples=100, shuffle=None, noise=None, random_state=None, factor=0.5):
+    """
+    Функция для генерации трехмерных данных, представляющих множество концентрических сфер.
+
+    Параметры:
+        n_samples (int): Общее количество генерируемых точек (default = 100).
+        shuffle (bool): Следует ли перетасовывать образцы.
+        noise (float): Стандартное отклонение гауссовского шума, добавленного к данным.
+        random_state (int): Определяет генерацию случайных чисел для перетасовки набора данных и шума.
+        factor (float): Масштабный коэффициент между внутренней и внешней сферой (default = 0.5).
+
+    Возвращает:
+        tuple: Данные точек и метки кластеров.
+            - data: Список из трех массивов (X, Y, Z), представляющих координаты точек.
+            - labels: Метки классов для каждой точки.
+    """
     levels = 10
     n_samp = round(n_samples * (2 / 3))
     z = [sin(i) for i in arange(-pi / 2, pi / 2 + ((pi / 2) / levels), (pi / 2) / levels)]
