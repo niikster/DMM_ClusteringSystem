@@ -7,7 +7,7 @@
 #	    Николаев Михаил Алексеевич [Misha.via@yandex.ru]
 #	    Федоров Алексей Викторович [alexis.sasis7@gmail.com]
 #	    Салия Лука Мерабович [saliya.luka@bk.ru]
-
+#       Козлов Алексей Игоревич [alex_kozlov15@mail.ru]
 
 Описание:
 
