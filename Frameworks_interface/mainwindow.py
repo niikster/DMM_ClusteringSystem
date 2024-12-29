@@ -54,7 +54,7 @@ from PySide6.QtWidgets import (
 )
 
 from Frameworks_ccore.SettingsApp import SettingsApp
-from Frameworks_interface.strategy_options_window import StrategyOptionsDialog
+from Frameworks_interface.strategy_options_dialog import StrategyOptionsDialog
 from .ui_form import Ui_MainWindow
 from Frameworks_ccore.Loader import Loader
 from .widgets.sliderButton.QSliderButton import QSliderButton
