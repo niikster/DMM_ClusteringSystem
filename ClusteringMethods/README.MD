@@ -167,4 +167,191 @@ rock(data, eps, number_clusters=3, threshold=0.5, ccore=True)
 ---
 
 
+### 5. DBSCAN (Density-Based Spatial Clustering of Applications with Noise)
+
+**Установка:**
+```bash
+python -m pip install scikit-learn
+```
+**Импорт:**
+```python
+from sklearn.cluster import DBSCAN
+```
+
+**Описание метода:**
+DBSCAN (Density-Based Spatial Clustering of Applications with Noise) — это алгоритм кластеризации, основанный на плотности, который выделяет кластеры по плотности точек и позволяет эффективно работать с шумовыми данными.
+
+**Сигнатура:**
+```python
+class sklearn.cluster.DBSCAN(
+    eps=0.5, min_samples=5, metric='euclidean',
+    algorithm='auto', leaf_size=30, p=2, n_jobs=None
+)
+```
+
+**Параметры:**
+- **eps** (*float*, по умолчанию 0.5): Максимальное расстояние между точками, чтобы считать их соседями.
+- **min_samples** (*int*, по умолчанию 5): Минимальное число точек для формирования плотного кластера.
+- **metric** (*str*, по умолчанию 'euclidean'): Метрика расстояния между точками.
+- **algorithm** (*str*, по умолчанию 'auto'): Алгоритм расчета: 'auto', 'ball_tree', 'kd_tree', 'brute'.
+- **leaf_size** (*int*, по умолчанию 30): Параметр для оптимизации скорости деревьев.
+- **p** (*float*, по умолчанию 2): Степень метрики Minkowski.
+- **n_jobs** (*int*, по умолчанию None): Число потоков (-1 для использования всех доступных).
+
+**Источник:** [Документация scikit-learn](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html)
+
+---
+
+### 6. HDBSCAN (Hierarchical DBSCAN)
+
+**Установка:**
+```bash
+python -m pip install hdbscan
+```
+**Импорт:**
+```python
+from hdbscan import HDBSCAN
+```
+
+**Описание метода:**
+HDBSCAN (Hierarchical Density-Based Spatial Clustering of Applications with Noise) расширяет DBSCAN для работы с иерархическими структурами кластеров и автоматического определения количества кластеров.
+
+**Сигнатура:**
+```python
+class hdbscan.HDBSCAN(
+    min_cluster_size=5, metric='euclidean', cluster_selection_method='eom'
+)
+```
+
+**Параметры:**
+- **min_cluster_size** (*int*, по умолчанию 5): Минимальное количество точек в кластере.
+- **metric** (*str*, по умолчанию 'euclidean'): Метрика для расчета расстояний.
+- **cluster_selection_method** (*str*, по умолчанию 'eom'): Метод выбора кластеров ('eom' или 'leaf').
+
+**Источник:** [Документация HDBSCAN](https://hdbscan.readthedocs.io/en/latest/)
+
+---
+
+### 7. GMM (Gaussian Mixture Model)
+
+**Установка:**
+```bash
+python -m pip install scikit-learn
+```
+**Импорт:**
+```python
+from sklearn.mixture import GaussianMixture
+```
+
+**Описание метода:**
+GMM (Gaussian Mixture Model) использует подходы вероятностного моделирования для определения кластеров, предполагая, что данные распределены как смесь нескольких гауссианов.
+
+**Сигнатура:**
+```python
+class sklearn.mixture.GaussianMixture(
+    n_components=1, covariance_type='full', tol=0.001, max_iter=100
+)
+```
+
+**Параметры:**
+- **n_components** (*int*, по умолчанию 1): Количество гауссианов.
+- **covariance_type** (*str*, по умолчанию 'full'): Тип ковариации ('full', 'tied', 'diag', 'spherical').
+- **tol** (*float*, по умолчанию 0.001): Порог для завершения итераций.
+- **max_iter** (*int*, по умолчанию 100): Максимальное количество итераций.
+
+**Источник:** [Документация scikit-learn](https://scikit-learn.org/stable/modules/generated/sklearn.mixture.GaussianMixture.html)
+
+---
+
+### 8. OPTICS (Ordering Points To Identify the Clustering Structure)
+
+**Установка:**
+```bash
+python -m pip install scikit-learn
+```
+**Импорт:**
+```python
+from sklearn.cluster import OPTICS
+```
+
+**Описание метода:**
+OPTICS — это алгоритм кластеризации, который упорядочивает точки так, чтобы можно было определить иерархические кластеры.
+
+**Сигнатура:**
+```python
+class sklearn.cluster.OPTICS(
+    min_samples=5, max_eps=np.inf, metric='minkowski',
+    p=2, cluster_method='xi', eps=np.inf
+)
+```
+
+**Параметры:**
+- **min_samples** (*int*, по умолчанию 5): Минимальное число точек в кластере.
+- **max_eps** (*float*, по умолчанию np.inf): Максимальное расстояние для кластеризации.
+- **metric** (*str*, по умолчанию 'minkowski'): Метрика для расчета расстояния.
+- **p** (*float*, по умолчанию 2): Степень метрики Minkowski.
+- **cluster_method** (*str*, по умолчанию 'xi'): Метод кластеризации ('xi' или 'dbscan').
+- **eps** (*float*, по умолчанию np.inf): Максимальное расстояние между точками для включения в кластер.
+
+**Источник:** [Документация scikit-learn](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.OPTICS.html)
+
+---
+
+### 9. Spectral Biclustering
+
+**Установка:**
+```bash
+python -m pip install scikit-learn
+```
+**Импорт:**
+```python
+from sklearn.cluster import SpectralBiclustering
+```
+
+**Описание метода:**
+Spectral Biclustering — это метод, который находит кластеры как по строкам, так и по столбцам матрицы, выделяя скрытые структуры данных.
+
+**Сигнатура:**
+```python
+class sklearn.cluster.SpectralBiclustering(
+    n_clusters=3, method='bistochastic', n_components=6
+)
+```
+
+**Параметры:**
+- **n_clusters** (*int*, по умолчанию 3): Количество кластеров.
+- **method** (*str*, по умолчанию 'bistochastic'): Метод обработки ('bistochastic', 'scale', 'log').
+- **n_components** (*int*, по умолчанию 6): Количество компонент для анализа.
+
+**Источник:** [Документация scikit-learn](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.SpectralBiclustering.html)
+
+---
+
+### 10. BANG (Bounding And Nesting Grid)
+
+**Установка:**
+```bash
+python -m pip install pyclustering
+```
+**Импорт:**
+```python
+from pyclustering.cluster.bang import bang
+```
+
+**Описание метода:**
+BANG использует иерархическую сеточную структуру для быстрого поиска и выделения кластеров в многомерных данных.
+
+**Сигнатура:**
+```python
+bang(data, levels=15)
+```
+
+**Параметры:**
+- **data** (*list*): Входные данные, представленные в виде списка точек.
+- **levels** (*int*, по умолчанию 15): Глубина иерархии сетки.
+
+**Источник:** [Документация pyclustering](https://pyclustering.github.io/docs/0.10.1/html/da/d85/classpyclustering_1_1cluster_1_1bang_1_1bang.html)
+
+
+
 
