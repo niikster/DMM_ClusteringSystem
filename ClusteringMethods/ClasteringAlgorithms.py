@@ -37,10 +37,11 @@ class StrategyParam:
 
 
 class StrategyRunConfig:
-    _values: Dict[str, int | float | str | bool] = dict()
+    _values: Dict[str, int | float | str | bool]
 
     def __init__(self, params: Dict[str, StrategyParam]):
         self._params = params
+        self._values = dict()
 
     @property
     def params(self):

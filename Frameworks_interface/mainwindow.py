@@ -1,5 +1,7 @@
 # This Python file uses the following encoding: utf-8
 import time
+import copy
+
 from typing import Any, Dict, List
 
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
@@ -881,9 +883,9 @@ class MainWindow(QMainWindow):
         if stratConfig is None:
             return
 
-        self.__strategyOptionsDialog.setRunConfig(stratId, stratConfig)
+        self.__strategyOptionsDialog.setRunConfig(stratId, copy.copy(stratConfig))
 
-        self.__strategyOptionsDialog.optionsApplied.connect(lambda options: self.__strategiesConfigs.__setitem__(stratId, options))
+        self.__strategyOptionsDialog.optionsApplied.connect(lambda options: self.__strategiesConfigs.__setitem__(stratId, options), Qt.ConnectionType.SingleShotConnection)
         self.__strategyOptionsDialog.show()
 
     '''
