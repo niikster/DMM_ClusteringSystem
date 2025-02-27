@@ -352,6 +352,39 @@ bang(data, levels=15)
 
 **Источник:** [Документация pyclustering](https://pyclustering.github.io/docs/0.10.1/html/da/d85/classpyclustering_1_1cluster_1_1bang_1_1bang.html)
 
+---
+
+### 11. Fuzzy C-means
+
+**Установка:**
+```bash
+python -m pip install scikit-fuzzy
+```
+**Импорт:**
+```python
+from skfuzzy.cluster import cmeans
+```
+
+**Описание метода:**
+Метод нечёткой кластеризации C-средних позволяет разбить имеющееся множество элементов мощностью *N* на заданное число нечётких множеств *k*.
+
+**Сигнатура:**
+```python
+cmeans(data, 
+        c=2,
+        m=2.0,
+        error=0.005,
+        maxiter=1000)
+```
+
+**Параметры:**
+- **data** (*list*): Входные данные, представленные в виде списка точек.
+- **c** (*int*, по умолчанию 2): Желаемое количество кластеров.
+- **m**(*float*, по умолчанию 2.0): Фактор фаззификации.
+- **error**(*float*, по умолчанию 0.005): Критерий остановки; остановка досрочная, если норма (u[p] - u[p-1]) < ошибка.
+- **maxiter**(*int*, по умолчанию 1000): Максимальное разрешенное количество итераций.
+
+**Источник:** [Документация scikit-fuzzy](https://pythonhosted.org/scikit-fuzzy/api/skfuzzy.cluster.html#cmeans)
 
 
 
