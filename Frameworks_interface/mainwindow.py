@@ -110,18 +110,16 @@ switch_tootip_tw2_fr1 = [
     f"Количество фитчей [uint, (default: {DEFAULT_VALUE[1]})]",
     f"Количество центров [uint, (default: {DEFAULT_VALUE[2]})]",
     f"Стандартное отклонение кластеров [float, (default: {DEFAULT_VALUE[3]})]",
-    f"Ограничивающая рамка для каждого центра кластера [tuple(float, float), (default: {
-        DEFAULT_VALUE[4]})]",
+    f"Ограничивающая рамка для каждого центра кластера [tuple(float, float), (default: {DEFAULT_VALUE[4]})]",
     f"random_state (seed) [int, (default: {DEFAULT_VALUE[5]})]",
     f"коэффициент масштабирования [int, (default: {DEFAULT_VALUE[6]})]",
     f"noise [float, (default: {DEFAULT_VALUE[7]})]",
     f"Коэффициент нормировки [float: (default: {DEFAULT_VALUE[8]})]",
-    f"Смещение по оси y для одномерных данных [float: (default: {
-        DEFAULT_VALUE[9]})]",
-    f"смещение по оси z для двумерных данных [float: (default: {
-        DEFAULT_VALUE[10]})]",
+    f"Смещение по оси y для одномерных данных [float: (default: {DEFAULT_VALUE[9]})]",
+    f"смещение по оси z для двумерных данных [float: (default: {DEFAULT_VALUE[10]})]",
     f"Следует ли перетасовывать точки? [bool, (default: {DEFAULT_VALUE[11]})]",
-    f"Возвращать ли центры? [bool, (default: {DEFAULT_VALUE[12]})]"]
+    f"Возвращать ли центры? [bool, (default: {DEFAULT_VALUE[12]})]"
+    ]
 
 # [1.2]
 '''

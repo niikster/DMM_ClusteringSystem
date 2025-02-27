@@ -24,6 +24,8 @@ from sklearn.cluster import SpectralBiclustering
 from sklearn.cluster import OPTICS
 from sklearn.mixture import GaussianMixture 
 
+from skfuzzy.cluster import cmeans
+
 from typing import Dict, List
 
 
@@ -1049,3 +1051,42 @@ class ConcreteStrategyBANG(Strategy):
         
         # Преобразование кластеров в метки
         return np.array(self.clusters_to_labels(clusters))
+
+
+@StrategiesManager.registerStrategy("fuzzy_cmeans", "Fuzzy C-Means")
+class ConcreteStrategyFCM(Strategy):
+    """Метод кластеризации с использованием Fuzzy C-Means из библиотеки scikit-fuzzy"""
+
+    @classmethod
+    def _setupParams(cls):
+        cls._addParam("n_clusters", "Количество кластеров", StrategyParamType.UNumber,
+            "(Number of clusters) Количество кластеров для разбиения", 3)
+        cls._addParam("m", "Фаззи-фактор", StrategyParamType.Floating,
+            """(Fuzziness factor) Определяет степень размытости кластеров. 
+            Фактор должен быть строго больше 1 (m > 1)""", 2.0)
+        cls._addParam("error", "Допустимая ошибка", StrategyParamType.UFloating,
+            "(Tolerance) Критерий остановки алгоритма", 0.005)
+        cls._addParam("maxiter", "Максимальное число итераций", StrategyParamType.UNumber,
+            "(Max iterations) Максимальное количество итераций", 1000)
+
+    def clastering_image(self, pixels: np.ndarray, params: StrategyRunConfig) -> np.ndarray:
+        pixels_t = np.transpose(pixels)
+        cntr, u, _, _, _, _, _ = cmeans(pixels_t, 
+                                        c=int(params["n_clusters"]), 
+                                        m=float(params["m"]), 
+                                        error=float(params["error"]), 
+                                        maxiter=int(params["maxiter"]), 
+                                        init=None)
+        cluster_membership = np.argmax(u, axis=0)
+        return cluster_membership
+
+    def clastering_points(self, points: np.ndarray, params: StrategyRunConfig) -> np.ndarray:
+        points_t = np.transpose(points)
+        cntr, u, _, _, _, _, _ = cmeans(points_t, 
+                                        c=int(params["n_clusters"]), 
+                                        m=float(params["m"]), 
+                                        error=float(params["error"]), 
+                                        maxiter=int(params["maxiter"]), 
+                                        init=None)
+        cluster_membership = np.argmax(u, axis=0)
+        return cluster_membership

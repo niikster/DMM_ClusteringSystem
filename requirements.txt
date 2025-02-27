@@ -8,3 +8,4 @@ pyclustering
 PySide6
 qstylizer
 opencv-python
+scikit-fuzzy
